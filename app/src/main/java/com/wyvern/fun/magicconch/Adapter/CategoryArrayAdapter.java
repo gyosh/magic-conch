@@ -2,10 +2,14 @@ package com.wyvern.fun.magicconch.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,10 +36,18 @@ public class CategoryArrayAdapter extends ArrayAdapter<Category> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.category_row, parent, false);
         }
 
+        ImageView img = (ImageView) convertView.findViewById(R.id.category_image);
         TextView text = (TextView) convertView.findViewById(R.id.category_text);
+
+        if (isAddButton(category)){
+            img.setImageResource(android.R.drawable.ic_input_add);
+        }
         text.setText(category.getName());
 
         return convertView;
     }
 
+    private boolean isAddButton(Category item){
+        return item.getId() < 0;
+    }
 }

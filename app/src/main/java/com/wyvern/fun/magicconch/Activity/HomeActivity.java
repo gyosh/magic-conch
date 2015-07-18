@@ -38,6 +38,7 @@ public class HomeActivity extends ActionBarActivity {
 
     private void populateCategoryList() {
         loadCategories();
+
         CategoryArrayAdapter adapter = new CategoryArrayAdapter(this, categories);
         mCategoryListView.setAdapter(adapter);
     }
@@ -49,6 +50,8 @@ public class HomeActivity extends ActionBarActivity {
     }
 
     private void loadCategories() {
+        categories.clear();
+
         Cursor cursor = mDbAdapter.fetchAllCategories();
         cursor.moveToFirst();
 
@@ -58,6 +61,9 @@ public class HomeActivity extends ActionBarActivity {
             String lastAccess = cursor.getString(2);
             categories.add(new Category(id, name, lastAccess));
         }while (cursor.moveToNext());
+
+        // quick & dirty, "add new" as list item
+        categories.add(new Category(-1, "Add new", ""));
     }
 
     private void addListener() {
@@ -66,9 +72,17 @@ public class HomeActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                 Category value = (Category) adapter.getItemAtPosition(position);
 
-                Intent i = new Intent(HomeActivity.this, AskActivity.class);
-                i.putExtra(DbAdapter.CATEGORY_ROW_ID, value.getId());
-                startActivity(i);
+                if (isAddButton(value)){
+                    Log.d("GOZ", "add new");
+                }else{
+                    Intent i = new Intent(HomeActivity.this, AskActivity.class);
+                    i.putExtra(DbAdapter.CATEGORY_ROW_ID, value.getId());
+                    startActivity(i);
+                }
+            }
+
+            private boolean isAddButton(Category item){
+                return item.getId() < 0;
             }
         });
     }
