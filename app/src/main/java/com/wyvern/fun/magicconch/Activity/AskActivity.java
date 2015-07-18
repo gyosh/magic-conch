@@ -63,15 +63,15 @@ public class AskActivity extends ActionBarActivity {
 
     private void loadPossibleAnswers() {
         Cursor cursor = mDbAdapter.fetchOptions(categoryId);
-        cursor.moveToFirst();
-
-        do {
-            String answerText = cursor.getString(1);
-            boolean enabled = cursor.getInt(2) > 0;
-            if (enabled){
-                answers.add(answerText);
-            }
-        } while (cursor.moveToNext());
+        if (cursor.moveToFirst()){
+            do {
+                String answerText = cursor.getString(1);
+                boolean enabled = cursor.getInt(2) > 0;
+                if (enabled){
+                    answers.add(answerText);
+                }
+            } while (cursor.moveToNext());
+        }
     }
 
     private void registerButtonListener(){

@@ -17,4 +17,6 @@
     <string name="menu_category_rename">Rename</string>
     <string name="menu_category_edit_option">Edit options</string>
     <string name="menu_category_delete">Delete</string>
+    <string name="menu_option_rename">Rename</string>
+    <string name="menu_option_delete">Delete</string>
 </resources>

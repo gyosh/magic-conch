@@ -1,13 +1,23 @@
 package com.wyvern.fun.magicconch.Activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 
-import com.wyvern.fun.magicconch.Adapter.CategoryArrayAdapter;
 import com.wyvern.fun.magicconch.Adapter.DbAdapter;
 import com.wyvern.fun.magicconch.Adapter.OptionArrayAdapter;
 import com.wyvern.fun.magicconch.Model.Category;
@@ -19,6 +29,7 @@ import java.util.List;
 
 
 public class EditActivity extends ActionBarActivity {
+    private static final int DIALOG_ADD_NEW_OPTION = 0;
     private ListView mOptionListView;
     private DbAdapter mDbAdapter;
     private ArrayList<Option> options;
@@ -33,6 +44,7 @@ public class EditActivity extends ActionBarActivity {
         initializeFields();
         mDbAdapter.open();
         populateOptionList();
+        addListener();
     }
 
     private void retrieveCategoryId() {
@@ -70,6 +82,62 @@ public class EditActivity extends ActionBarActivity {
         options.add(new Option(-1, "Add new", false));
     }
 
+    private void addListener(){
+        registerForContextMenu(mOptionListView);
+
+        mOptionListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                Option value = (Option) adapter.getItemAtPosition(position);
+
+                if (isAddButton(value)) {
+                    showDialog(DIALOG_ADD_NEW_OPTION);
+                } else {
+                    // TODO: toggle enable
+                }
+            }
+
+            private boolean isAddButton(Option item) {
+                return item.getId() < 0;
+            }
+        });
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        AlertDialog dialogDetails = null;
+
+        switch (id){
+            case DIALOG_ADD_NEW_OPTION:
+                LayoutInflater inflater = LayoutInflater.from(this);
+                final View dialogView = inflater.inflate(R.layout.add_option_dialog, null);
+                final EditText enteredText = (EditText) dialogView.findViewById(R.id.add_option_text);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Enter Option");
+                builder.setView(dialogView);
+
+                builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Long rowId = mDbAdapter.createOption("" + enteredText.getText(), categoryId);
+                        Log.d("GOZ", "added " + rowId + " " + enteredText.getText());
+                        enteredText.setText("");
+                        populateOptionList();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        enteredText.setText("");
+                        dialog.cancel();
+                    }
+                });
+
+                dialogDetails = builder.create();
+                break;
+        }
+        return dialogDetails;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -90,5 +158,19 @@ public class EditActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater mi = getMenuInflater();
+
+        if (((AdapterView.AdapterContextMenuInfo)menuInfo).position == options.size()-1) {
+            // preventing long click on "add option"
+            return;
+        }
+
+        mi.inflate(R.menu.menu_option_long_press, menu);
     }
 }
