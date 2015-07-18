@@ -11,8 +11,10 @@ import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -82,6 +84,8 @@ public class HomeActivity extends ActionBarActivity {
     }
 
     private void addListener() {
+        registerForContextMenu(mCategoryListView);
+
         mCategoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
@@ -165,4 +169,26 @@ public class HomeActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater mi = getMenuInflater();
+        mi.inflate(R.menu.menu_category_long_press, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_category_delete:
+                AdapterView.AdapterContextMenuInfo info =
+                        (AdapterView.AdapterContextMenuInfo)
+                                item.getMenuInfo();
+                Category category = categories.get((int)info.id);
+                mDbAdapter.deleteCategory(category.getId());
+                populateCategoryList();
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }
 }

@@ -14,4 +14,7 @@
     <string name="cancel">Cancel</string>
     <string name="add_category_label">New list name:</string>
     <string name="default_date">2015-01-01 00:00:00</string>
+    <string name="menu_category_rename">Rename</string>
+    <string name="menu_category_edit_option">Edit options</string>
+    <string name="menu_category_delete">Delete</string>
 </resources>

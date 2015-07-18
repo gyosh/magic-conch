@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    <item android:id="@+id/menu_category_rename"
+        android:title="@string/menu_category_rename" />
+    <item android:id="@+id/menu_category_edit_option"
+        android:title="@string/menu_category_edit_option" />
+-->
+    <item android:id="@+id/menu_category_delete"
+        android:title="@string/menu_category_delete" />
+</menu>
