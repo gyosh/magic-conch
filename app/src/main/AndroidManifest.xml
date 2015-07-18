@@ -8,13 +8,25 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".HomeActivity"
+            android:name=".Activity.HomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activity.AskActivity"
+            android:label="@string/title_activity_ask" >
+        </activity>
+        <activity
+            android:name=".Activity.EditActivity"
+            android:label="@string/title_activity_edit" >
+        </activity>
+        <activity
+            android:name=".Activity.AboutActivity"
+            android:label="@string/title_activity_about" >
         </activity>
     </application>
 
