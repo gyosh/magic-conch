@@ -97,6 +97,14 @@ public class DbAdapter {
         return mDb.delete(TABLE_OPTION, OPTION_ROW_ID + "=" + rowId, null) > 0;
     }
 
+    public boolean updateOption(long rowId, String name, boolean enabled) {
+        ContentValues args = new ContentValues();
+
+        args.put(OPTION_NAME, name);
+        args.put(OPTION_ENABLED, enabled ? 1 : 0);
+        return mDb.update(TABLE_OPTION, args, OPTION_ROW_ID + "=" + rowId, null) > 0;
+    }
+
     public Cursor fetchOptions(int categoryId) {
         return mDb.query(TABLE_OPTION, new String[] {OPTION_ROW_ID, OPTION_NAME, OPTION_ENABLED},
                 OPTION_CATEGORY + "=" + categoryId , null, null, null, null);

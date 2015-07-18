@@ -3,7 +3,6 @@ package com.wyvern.fun.magicconch.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -20,12 +19,10 @@ import android.widget.ListView;
 
 import com.wyvern.fun.magicconch.Adapter.DbAdapter;
 import com.wyvern.fun.magicconch.Adapter.OptionArrayAdapter;
-import com.wyvern.fun.magicconch.Model.Category;
 import com.wyvern.fun.magicconch.Model.Option;
 import com.wyvern.fun.magicconch.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class EditActivity extends ActionBarActivity {
@@ -33,6 +30,7 @@ public class EditActivity extends ActionBarActivity {
     private ListView mOptionListView;
     private DbAdapter mDbAdapter;
     private ArrayList<Option> options;
+    private OptionArrayAdapter optionArrayAdapter;
     private int categoryId;
 
     @Override
@@ -61,8 +59,8 @@ public class EditActivity extends ActionBarActivity {
     private void populateOptionList() {
         loadOptions();
 
-        OptionArrayAdapter adapter = new OptionArrayAdapter(this, options);
-        mOptionListView.setAdapter(adapter);
+        optionArrayAdapter = new OptionArrayAdapter(this, options);
+        mOptionListView.setAdapter(optionArrayAdapter);
     }
 
     private void loadOptions(){
@@ -93,7 +91,9 @@ public class EditActivity extends ActionBarActivity {
                 if (isAddButton(value)) {
                     showDialog(DIALOG_ADD_NEW_OPTION);
                 } else {
-                    // TODO: toggle enable
+                    value.setEnabled(!value.isEnabled());
+                    mDbAdapter.updateOption(value.getId(), value.getName(), value.isEnabled());
+                    optionArrayAdapter.notifyDataSetChanged();
                 }
             }
 
