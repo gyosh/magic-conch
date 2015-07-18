@@ -173,4 +173,20 @@ public class EditActivity extends ActionBarActivity {
 
         mi.inflate(R.menu.menu_option_long_press, menu);
     }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item){
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo)
+                        item.getMenuInfo();
+        Option option = options.get((int)info.id);
+
+        switch(item.getItemId()) {
+            case R.id.menu_option_delete:
+                mDbAdapter.deleteOption(option.getId());
+                populateOptionList();
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }
 }
