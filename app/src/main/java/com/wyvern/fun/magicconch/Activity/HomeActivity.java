@@ -1,16 +1,24 @@
 package com.wyvern.fun.magicconch.Activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wyvern.fun.magicconch.Adapter.CategoryArrayAdapter;
 import com.wyvern.fun.magicconch.Adapter.DbAdapter;
@@ -21,6 +29,8 @@ import java.util.ArrayList;
 
 
 public class HomeActivity extends ActionBarActivity {
+    private final int DIALOG_ADD_NEW_CATEGORY = 0;
+
     private ListView mCategoryListView;
     private DbAdapter mDbAdapter;
     private ArrayList<Category> categories;
@@ -32,8 +42,13 @@ public class HomeActivity extends ActionBarActivity {
 
         initializeFields();
         mDbAdapter.open();
-        populateCategoryList();
         addListener();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        populateCategoryList();
     }
 
     private void populateCategoryList() {
@@ -72,19 +87,59 @@ public class HomeActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                 Category value = (Category) adapter.getItemAtPosition(position);
 
-                if (isAddButton(value)){
-                    Log.d("GOZ", "add new");
-                }else{
+                if (isAddButton(value)) {
+                    showDialog(DIALOG_ADD_NEW_CATEGORY);
+
+                } else {
                     Intent i = new Intent(HomeActivity.this, AskActivity.class);
                     i.putExtra(DbAdapter.CATEGORY_ROW_ID, value.getId());
                     startActivity(i);
                 }
             }
 
-            private boolean isAddButton(Category item){
+            private boolean isAddButton(Category item) {
                 return item.getId() < 0;
             }
         });
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        AlertDialog dialogDetails = null;
+
+        switch (id) {
+            case DIALOG_ADD_NEW_CATEGORY:
+                LayoutInflater inflater = LayoutInflater.from(this);
+                final View dialogView = inflater.inflate(R.layout.add_category_dialog, null);
+                final EditText enteredText = (EditText) dialogView.findViewById(R.id.add_category_text);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Enter List Name");
+
+                builder.setView(dialogView);
+
+                builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Long rowId = mDbAdapter.createCategory("" + enteredText.getText());
+
+                        Intent i = new Intent(HomeActivity.this, EditActivity.class);
+                        i.putExtra(DbAdapter.CATEGORY_ROW_ID, rowId);
+
+                        enteredText.setText("");
+                        startActivity(i);
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        enteredText.setText("");
+                        dialog.cancel();
+                    }
+                });
+
+                dialogDetails = builder.create();
+                break;
+        }
+        return dialogDetails;
     }
 
 
@@ -109,4 +164,5 @@ public class HomeActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
