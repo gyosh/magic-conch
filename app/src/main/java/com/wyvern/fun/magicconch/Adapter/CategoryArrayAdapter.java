@@ -1,10 +1,12 @@
 package com.wyvern.fun.magicconch.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wyvern.fun.magicconch.Model.Category;
@@ -35,4 +37,5 @@ public class CategoryArrayAdapter extends ArrayAdapter<Category> {
 
         return convertView;
     }
+
 }

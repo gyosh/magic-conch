@@ -1,10 +1,15 @@
 package com.wyvern.fun.magicconch.Activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.wyvern.fun.magicconch.Adapter.CategoryArrayAdapter;
@@ -28,6 +33,7 @@ public class HomeActivity extends ActionBarActivity {
         initializeFields();
         mDbAdapter.open();
         populateCategoryList();
+        addListener();
     }
 
     private void populateCategoryList() {
@@ -53,6 +59,20 @@ public class HomeActivity extends ActionBarActivity {
             categories.add(new Category(id, name, lastAccess));
         }while (cursor.moveToNext());
     }
+
+    private void addListener() {
+        mCategoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+                Category value = (Category) adapter.getItemAtPosition(position);
+
+                Intent i = new Intent(HomeActivity.this, AskActivity.class);
+                i.putExtra(DbAdapter.CATEGORY_ROW_ID, value.getId());
+                startActivity(i);
+            }
+        });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
