@@ -7,23 +7,28 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.wyvern.fun.magicconch.Adapter.DbAdapter;
 import com.wyvern.fun.magicconch.R;
 
 
 public class HomeActivity extends ActionBarActivity {
     private ListView mCategoryListView;
+    private DbAdapter mDbAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        initializeField();
+        initializeFields();
         facadeCategoryList();
     }
 
-    private void initializeField() {
+    private void initializeFields() {
         mCategoryListView = (ListView) findViewById(R.id.categoryList);
+        mDbAdapter = new DbAdapter(this);
+
+        mDbAdapter.open();
     }
 
     private void facadeCategoryList() {

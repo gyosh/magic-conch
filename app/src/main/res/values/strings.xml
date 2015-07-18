@@ -10,4 +10,5 @@
     <string name="placeholder_coty">How about...</string>
     <string name="placeholder_answer">Fasilkom Canteen</string>
     <string name="ask">Ask</string>
+    <string name="default_date">2015-01-01 00:00:00</string>
 </resources>
