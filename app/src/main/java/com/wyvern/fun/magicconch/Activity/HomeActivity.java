@@ -1,19 +1,24 @@
 package com.wyvern.fun.magicconch.Activity;
 
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.wyvern.fun.magicconch.Adapter.CategoryArrayAdapter;
 import com.wyvern.fun.magicconch.Adapter.DbAdapter;
+import com.wyvern.fun.magicconch.Model.Category;
 import com.wyvern.fun.magicconch.R;
+
+import java.util.ArrayList;
 
 
 public class HomeActivity extends ActionBarActivity {
     private ListView mCategoryListView;
     private DbAdapter mDbAdapter;
+    private ArrayList<Category> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,20 +26,32 @@ public class HomeActivity extends ActionBarActivity {
         setContentView(R.layout.activity_home);
 
         initializeFields();
-        facadeCategoryList();
+        mDbAdapter.open();
+        populateCategoryList();
+    }
+
+    private void populateCategoryList() {
+        loadCategories();
+        CategoryArrayAdapter adapter = new CategoryArrayAdapter(this, categories);
+        mCategoryListView.setAdapter(adapter);
     }
 
     private void initializeFields() {
-        mCategoryListView = (ListView) findViewById(R.id.categoryList);
+        mCategoryListView = (ListView) findViewById(R.id.category_list);
         mDbAdapter = new DbAdapter(this);
-
-        mDbAdapter.open();
+        categories = new ArrayList<>();
     }
 
-    private void facadeCategoryList() {
-        String[] categories = new String[]{"Fasilkom Canteen", "Office Canteen", "Where to Hangout"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.category_row, R.id.textView, categories);
-        mCategoryListView.setAdapter(adapter);
+    private void loadCategories() {
+        Cursor cursor = mDbAdapter.fetchAllCategories();
+        cursor.moveToFirst();
+
+        do{
+            int id = cursor.getInt(0);
+            String name = cursor.getString(1);
+            String lastAccess = cursor.getString(2);
+            categories.add(new Category(id, name, lastAccess));
+        }while (cursor.moveToNext());
     }
 
     @Override
