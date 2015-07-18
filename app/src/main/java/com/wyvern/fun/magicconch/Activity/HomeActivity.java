@@ -70,14 +70,16 @@ public class HomeActivity extends ActionBarActivity {
         categories.clear();
 
         Cursor cursor = mDbAdapter.fetchAllCategories();
-        cursor.moveToFirst();
 
-        do{
-            int id = cursor.getInt(0);
-            String name = cursor.getString(1);
-            String lastAccess = cursor.getString(2);
-            categories.add(new Category(id, name, lastAccess));
-        }while (cursor.moveToNext());
+        if (cursor.moveToFirst()){ // needed, as explosion occurs if returned empty row
+            do{
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                String lastAccess = cursor.getString(2);
+                categories.add(new Category(id, name, lastAccess));
+            }while (cursor.moveToNext());
+
+        }
 
         // quick & dirty, "add new" as list item
         categories.add(new Category(-1, "Add new", ""));
@@ -146,7 +148,6 @@ public class HomeActivity extends ActionBarActivity {
         return dialogDetails;
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -174,19 +175,31 @@ public class HomeActivity extends ActionBarActivity {
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater mi = getMenuInflater();
+
+        if (((AdapterView.AdapterContextMenuInfo)menuInfo).position == categories.size()-1) {
+            // preventing long click on "add category"
+            return;
+        }
+
         mi.inflate(R.menu.menu_category_long_press, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo)
+                        item.getMenuInfo();
+        Category category = categories.get((int)info.id);
+
         switch(item.getItemId()) {
             case R.id.menu_category_delete:
-                AdapterView.AdapterContextMenuInfo info =
-                        (AdapterView.AdapterContextMenuInfo)
-                                item.getMenuInfo();
-                Category category = categories.get((int)info.id);
                 mDbAdapter.deleteCategory(category.getId());
                 populateCategoryList();
+                return true;
+            case R.id.menu_category_edit_option:
+                Intent i = new Intent(this, EditActivity.class);
+                i.putExtra(DbAdapter.CATEGORY_ROW_ID, category.getId());
+                startActivity(i);
                 return true;
         }
         return super.onContextItemSelected(item);

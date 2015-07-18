@@ -1,19 +1,73 @@
 package com.wyvern.fun.magicconch.Activity;
 
+import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
+import com.wyvern.fun.magicconch.Adapter.CategoryArrayAdapter;
+import com.wyvern.fun.magicconch.Adapter.DbAdapter;
+import com.wyvern.fun.magicconch.Adapter.OptionArrayAdapter;
+import com.wyvern.fun.magicconch.Model.Category;
+import com.wyvern.fun.magicconch.Model.Option;
 import com.wyvern.fun.magicconch.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class EditActivity extends ActionBarActivity {
+    private ListView mOptionListView;
+    private DbAdapter mDbAdapter;
+    private ArrayList<Option> options;
+    private int categoryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+        retrieveCategoryId();
+        initializeFields();
+        mDbAdapter.open();
+        populateOptionList();
+    }
+
+    private void retrieveCategoryId() {
+        Bundle extras = getIntent().getExtras();
+        categoryId = extras.getInt(DbAdapter.CATEGORY_ROW_ID);
+    }
+
+    private void initializeFields() {
+        mOptionListView = (ListView) findViewById(R.id.option_list);
+        mDbAdapter = new DbAdapter(this);
+        options = new ArrayList<>();
+    }
+
+    private void populateOptionList() {
+        loadOptions();
+
+        OptionArrayAdapter adapter = new OptionArrayAdapter(this, options);
+        mOptionListView.setAdapter(adapter);
+    }
+
+    private void loadOptions(){
+        options.clear();
+
+        Cursor cursor = mDbAdapter.fetchOptions(categoryId);
+        if (cursor.moveToFirst()){ // needed, as explosion occurs if returned empty row
+            do {
+                int id = cursor.getInt(0);
+                String answerText = cursor.getString(1);
+                boolean enabled = cursor.getInt(2) > 0;
+                options.add(new Option(id, answerText, enabled));
+            } while (cursor.moveToNext());
+        }
+
+        // quick & dirty, "add new" as list item
+        options.add(new Option(-1, "Add new", false));
     }
 
     @Override
