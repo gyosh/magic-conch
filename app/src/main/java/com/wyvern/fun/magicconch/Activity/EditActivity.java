@@ -2,6 +2,7 @@ package com.wyvern.fun.magicconch.Activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -113,12 +115,20 @@ public class EditActivity extends ActionBarActivity {
         switch (id){
             case DIALOG_ADD_NEW_OPTION:
                 dialogDetails = getAddNewOptionDialog();
+                showKeyboard();
                 break;
             case DIALOG_RENAME_OPTION:
                 dialogDetails = getRenameOptionDialog(bundle);
+                showKeyboard();
                 break;
         }
+        
         return dialogDetails;
+    }
+
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     private AlertDialog getAddNewOptionDialog(){
@@ -158,9 +168,11 @@ public class EditActivity extends ActionBarActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Rename Option");
         builder.setView(dialogView);
-        enteredText.setText(option.getName());
 
-        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+        enteredText.setText(option.getName());
+        enteredText.setSelection(enteredText.getText().length());
+
+        builder.setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 String newName = enteredText.getText().toString();
 

@@ -2,6 +2,7 @@ package com.wyvern.fun.magicconch.Activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +14,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -115,12 +118,20 @@ public class HomeActivity extends ActionBarActivity {
         switch (id) {
             case DIALOG_ADD_NEW_CATEGORY:
                 dialogDetails = getAddNewCategoryDialog();
+                showKeyboard();
                 break;
             case DIALOG_RENAME_CATEGORY:
                 dialogDetails = getRenameCategoryDialog(bundle);
+                showKeyboard();
                 break;
         }
+
         return dialogDetails;
+    }
+
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     private AlertDialog getAddNewCategoryDialog(){
@@ -165,9 +176,11 @@ public class HomeActivity extends ActionBarActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Rename List");
         builder.setView(dialogView);
-        enteredText.setText(category.getName());
 
-        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+        enteredText.setText(category.getName());
+        enteredText.setSelection(enteredText.getText().length());
+
+        builder.setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 String newName = enteredText.getText().toString();
 
