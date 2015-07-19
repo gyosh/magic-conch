@@ -133,18 +133,24 @@ public class DbAdapter {
 
         private void putInitialData(SQLiteDatabase db){
             int optionRow = 0;
+            int categoryRow = 0;
 
-            insertCategory(db, 1, "Yes/No question");
-            insertOption(db, ++optionRow, 1, "Yes!", 1);
-            insertOption(db, ++optionRow, 1, "No!", 1);
-            insertOption(db, ++optionRow, 1, "Absolutely, baby~", 1);
-            insertOption(db, ++optionRow, 1, "Nope...", 1);
-            insertOption(db, ++optionRow, 1, "You can disable option", 0);
+            insertCategory(db, ++categoryRow, "Yes/No question");
+            insertOption(db, ++optionRow, categoryRow, "Yes!", 1);
+            insertOption(db, ++optionRow, categoryRow, "No!", 1);
+            insertOption(db, ++optionRow, categoryRow, "Absolutely, baby~", 1);
+            insertOption(db, ++optionRow, categoryRow, "Nope...", 1);
 
-            insertCategory(db, 2, "What to eat");
-            insertOption(db, ++optionRow, 2, "Fried rice", 1);
-            insertOption(db, ++optionRow, 2, "Chicken curry", 1);
-            insertOption(db, ++optionRow, 2, "Vegetable salad", 1);
+            insertCategory(db, ++categoryRow, "What to eat");
+            insertOption(db, ++optionRow, categoryRow, "Fried rice", 1);
+            insertOption(db, ++optionRow, categoryRow, "Chicken curry", 1);
+            insertOption(db, ++optionRow, categoryRow, "Vegetable salad", 1);
+
+            insertCategory(db, ++categoryRow, "Long press me");
+            insertOption(db, ++optionRow, categoryRow, "You can disable option", 1);
+            insertOption(db, ++optionRow, categoryRow, "Try it by pressing me", 0);
+            insertOption(db, ++optionRow, categoryRow, "You can rename/delete option", 1);
+            insertOption(db, ++optionRow, categoryRow, "Try it by long-pressing me", 1);
         }
 
         private void insertCategory(SQLiteDatabase db, int rowId, String name){

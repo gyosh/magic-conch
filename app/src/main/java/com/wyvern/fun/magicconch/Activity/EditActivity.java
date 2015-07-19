@@ -122,7 +122,7 @@ public class EditActivity extends ActionBarActivity {
                 showKeyboard();
                 break;
         }
-        
+
         return dialogDetails;
     }
 
