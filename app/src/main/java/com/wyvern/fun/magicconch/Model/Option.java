@@ -29,4 +29,8 @@ public class Option {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

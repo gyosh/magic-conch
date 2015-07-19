@@ -27,4 +27,8 @@ public class Category {
     public String getLastAccess() {
         return lastAccess;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -27,6 +27,9 @@ import java.util.ArrayList;
 
 public class EditActivity extends ActionBarActivity {
     private static final int DIALOG_ADD_NEW_OPTION = 0;
+    private static final int DIALOG_RENAME_OPTION = 1;
+    private static final String INDEX = "index";
+
     private ListView mOptionListView;
     private DbAdapter mDbAdapter;
     private ArrayList<Option> options;
@@ -89,7 +92,7 @@ public class EditActivity extends ActionBarActivity {
                 Option value = (Option) adapter.getItemAtPosition(position);
 
                 if (isAddButton(value)) {
-                    showDialog(DIALOG_ADD_NEW_OPTION);
+                    showDialog(DIALOG_ADD_NEW_OPTION, Bundle.EMPTY);
                 } else {
                     value.setEnabled(!value.isEnabled());
                     mDbAdapter.updateOption(value.getId(), value.getName(), value.isEnabled());
@@ -104,38 +107,78 @@ public class EditActivity extends ActionBarActivity {
     }
 
     @Override
-    protected Dialog onCreateDialog(int id) {
+    protected Dialog onCreateDialog(int id, Bundle bundle) {
         AlertDialog dialogDetails = null;
 
         switch (id){
             case DIALOG_ADD_NEW_OPTION:
-                LayoutInflater inflater = LayoutInflater.from(this);
-                final View dialogView = inflater.inflate(R.layout.add_option_dialog, null);
-                final EditText enteredText = (EditText) dialogView.findViewById(R.id.add_option_text);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Enter Option");
-                builder.setView(dialogView);
-
-                builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Long rowId = mDbAdapter.createOption("" + enteredText.getText(), categoryId);
-                        Log.d("GOZ", "added " + rowId + " " + enteredText.getText());
-                        enteredText.setText("");
-                        populateOptionList();
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        enteredText.setText("");
-                        dialog.cancel();
-                    }
-                });
-
-                dialogDetails = builder.create();
+                dialogDetails = getAddNewOptionDialog();
+                break;
+            case DIALOG_RENAME_OPTION:
+                dialogDetails = getRenameOptionDialog(bundle);
                 break;
         }
         return dialogDetails;
+    }
+
+    private AlertDialog getAddNewOptionDialog(){
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View dialogView = inflater.inflate(R.layout.option_add_dialog, null);
+        final EditText enteredText = (EditText) dialogView.findViewById(R.id.add_option_text);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Option");
+        builder.setView(dialogView);
+
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Long rowId = mDbAdapter.createOption("" + enteredText.getText(), categoryId);
+                enteredText.setText("");
+                populateOptionList();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                enteredText.setText("");
+                dialog.cancel();
+            }
+        });
+
+        return builder.create();
+    }
+
+    private AlertDialog getRenameOptionDialog(Bundle bundle){
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View dialogView = inflater.inflate(R.layout.option_rename_dialog, null);
+        final EditText enteredText = (EditText) dialogView.findViewById(R.id.option_rename_text);
+
+        int optionIndex = bundle.getInt(INDEX);
+        final Option option = optionArrayAdapter.getItem(optionIndex);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Rename Option");
+        builder.setView(dialogView);
+        enteredText.setText(option.getName());
+
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                String newName = enteredText.getText().toString();
+
+                option.setName(newName);
+                mDbAdapter.updateOption(option.getId(), option.getName(), option.isEnabled());
+
+                enteredText.setText("");
+                optionArrayAdapter.notifyDataSetChanged();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                enteredText.setText("");
+                dialog.cancel();
+            }
+        });
+
+        return builder.create();
     }
 
     @Override
@@ -182,6 +225,12 @@ public class EditActivity extends ActionBarActivity {
         Option option = options.get((int)info.id);
 
         switch(item.getItemId()) {
+            case R.id.menu_option_rename:
+                Bundle extras = new Bundle();
+                extras.putInt(INDEX, (int)info.id);
+                showDialog(DIALOG_RENAME_OPTION, extras);
+                return true;
+
             case R.id.menu_option_delete:
                 mDbAdapter.deleteOption(option.getId());
                 populateOptionList();
